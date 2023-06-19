@@ -1,5 +1,5 @@
 //
-// Created by ginak on 2023/6/18.
+// Created by Ginakira on 2023/6/18.
 //
 
 #ifndef SMARTSTAINER__STAINING_SCHEME_GENERATOR_H_
@@ -43,7 +43,7 @@ class StainingSchemeGenerator : public QObject {
   QSet<QString> available_antibodies_;
   StainingMap antibody_spectrum_to_channels_;
   void SchemeBacktrace(const QStringList &selected_antibodies,
-                       QSet<QPair<QString, QString>> &used_spectrum_channel,
+                       QSet<QString> &used_spectrum,
                        StainingSchemeResultList &result_list,
                        StainingSchemeResult &cur_result,
                        int cur_index);

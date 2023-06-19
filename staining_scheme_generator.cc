@@ -1,5 +1,5 @@
 //
-// Created by ginak on 2023/6/18.
+// Created by Ginakira on 2023/6/18.
 //
 
 #include <QString>
@@ -79,11 +79,11 @@ void StainingSchemeGenerator::GenerateSchemes() {
   StainingSchemeResultList scheme_result_list;
   QStringList selected_antibodies_list
       (selected_antibodies_.begin(), selected_antibodies_.end());
-  QSet<QPair<QString, QString>> used_spectrum_channel;
+  QSet<QString> used_spectrum;
   StainingSchemeResult cur_result(selected_antibodies_list.size());
 
   SchemeBacktrace(selected_antibodies_list,
-                  used_spectrum_channel,
+                  used_spectrum,
                   scheme_result_list,
                   cur_result, 0);
 
@@ -91,8 +91,7 @@ void StainingSchemeGenerator::GenerateSchemes() {
 }
 
 void StainingSchemeGenerator::SchemeBacktrace(const QStringList &selected_antibodies,
-                                              QSet<QPair<QString,
-                                                         QString>> &used_spectrum_channel,
+                                              QSet<QString> &used_spectrum,
                                               StainingSchemeResultList &result_list,
                                               StainingSchemeResult &cur_result,
                                               int cur_index) {
@@ -109,22 +108,21 @@ void StainingSchemeGenerator::SchemeBacktrace(const QStringList &selected_antibo
     auto spectrum = it.key();
     auto channels = it.value();
     for (const auto &channel : channels) {
-      auto spectrum_channel = qMakePair(spectrum, channel);
-      if (used_spectrum_channel.contains(spectrum_channel)) {
+      if (used_spectrum.contains(spectrum)) {
         continue;
       }
 
       cur_result[cur_index].spectrum = spectrum;
       cur_result[cur_index].channel = channel;
-      used_spectrum_channel.insert(spectrum_channel);
+      used_spectrum.insert(spectrum);
 
       SchemeBacktrace(selected_antibodies,
-                      used_spectrum_channel,
+                      used_spectrum,
                       result_list,
                       cur_result,
                       cur_index + 1);
 
-      used_spectrum_channel.remove(spectrum_channel);
+      used_spectrum.remove(spectrum);
     }
   }
 }
