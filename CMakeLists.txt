@@ -19,7 +19,8 @@ set(PROJECT_SOURCES
         main_window.h
         main_window.ui
         staining_scheme_generator.cc
-        staining_scheme_generator.h)
+        staining_scheme_generator.h
+        version.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(SmartStainer
@@ -52,7 +53,7 @@ set_target_properties(SmartStainer PROPERTIES
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     # If enable this, qDebug will not be display in CLion
-    WIN32_EXECUTABLE TRUE
+#    WIN32_EXECUTABLE TRUE
 )
 
 install(TARGETS SmartStainer
