@@ -6,6 +6,7 @@
 #define SMARTSTAINER__STAINING_SCHEME_GENERATOR_H_
 
 #include <QMap>
+#include <QObject>
 #include <QSet>
 
 struct StainingGroup {
@@ -19,12 +20,12 @@ using StainingSchemeResultList = QList<StainingSchemeResult>;
 using StainingMap = QMap<QString, QMap<QString, QSet<QString>>>;
 
 class StainingSchemeGenerator : public QObject {
- Q_OBJECT
+  Q_OBJECT
  public:
   explicit StainingSchemeGenerator(QObject *parent, QString filename);
   ~StainingSchemeGenerator() override;
 
-  bool LoadFile();
+  bool LoadLibraryFile();
 
  public slots:
   void SelectAntibody(const QString &antibody);
@@ -32,7 +33,7 @@ class StainingSchemeGenerator : public QObject {
   void GenerateSchemes();
 
  signals:
-  void FileLoaded(bool success, QString filename, int lines_count);
+  void LibraryFileLoaded(bool success, QString filename, int lines_count);
   void AvailableAntibodiesRefreshed(QStringList antibodies);
   void SelectedAntibodiesRefreshed(QStringList antibodies);
   void SchemesGenerated(StainingSchemeResultList scheme_result_list);
@@ -45,8 +46,7 @@ class StainingSchemeGenerator : public QObject {
   void SchemeBacktrace(const QStringList &selected_antibodies,
                        QSet<QString> &used_spectrum,
                        StainingSchemeResultList &result_list,
-                       StainingSchemeResult &cur_result,
-                       int cur_index);
+                       StainingSchemeResult &cur_result, int cur_index);
 };
 
-#endif //SMARTSTAINER__STAINING_SCHEME_GENERATOR_H_
+#endif  // SMARTSTAINER__STAINING_SCHEME_GENERATOR_H_

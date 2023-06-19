@@ -6,22 +6,25 @@
 #include "staining_scheme_generator.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui {
+class MainWindow;
+}
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow {
- Q_OBJECT
+  Q_OBJECT
 
  public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow() override;
 
  private:
-  void ImportFile();
+  void ImportLibraryFile();
   void SetupStainingSchemeGenerator(const QString &filename);
 
  private slots:
-  void FileLoadedHandler(bool success, const QString &filename, int lines_count);
+  void LibraryFileLoadedHandler(bool success, const QString &filename,
+                                int lines_count);
   void RefreshAvailableAntibodies(const QStringList &antibodies);
   void RefreshSelectedAntibodies(const QStringList &antibodies);
   void AddAntibody();
@@ -29,9 +32,8 @@ class MainWindow : public QMainWindow {
   void GenerateSchemes();
   void ShowSchemes(const StainingSchemeResultList &scheme_result_list);
 
-
  private:
   Ui::MainWindow *ui;
   StainingSchemeGenerator *scheme_generator_ = nullptr;
 };
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H
