@@ -20,10 +20,13 @@ class MainWindow : public QMainWindow {
 
  private:
   void ImportLibraryFile();
+  void ImportSimilarityFile();
   void SetupStainingSchemeGenerator(const QString &filename);
 
  private slots:
   void LibraryFileLoadedHandler(bool success, const QString &filename,
+                                int lines_count);
+  void SimilarityFileLoadedHandler(bool success, const QString &filename,
                                 int lines_count);
   void RefreshAvailableAntibodies(const QStringList &antibodies);
   void RefreshSelectedAntibodies(const QStringList &antibodies);

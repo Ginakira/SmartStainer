@@ -1,6 +1,7 @@
 #include "main_window.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include "./ui_main_window.h"
 
@@ -10,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
 
   connect(ui->library_file_import_button, &QPushButton::clicked, this,
           &MainWindow::ImportLibraryFile);
+  connect(ui->similarity_file_import_button, &QPushButton::clicked, this,
+          &MainWindow::ImportSimilarityFile);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -17,7 +20,7 @@ MainWindow::~MainWindow() { delete ui; }
 void MainWindow::ImportLibraryFile() {
   QString cur_path = QCoreApplication::applicationDirPath();
   QString filename =
-      QFileDialog::getOpenFileName(this, "打开文件", cur_path, "文本(*.txt)");
+      QFileDialog::getOpenFileName(this, "打开库文件", cur_path, "文本(*.txt)");
 
   if (filename.isEmpty()) {
     return;
@@ -26,6 +29,23 @@ void MainWindow::ImportLibraryFile() {
   SetupStainingSchemeGenerator(filename);
   Q_ASSERT(scheme_generator_);
   scheme_generator_->LoadLibraryFile();
+}
+
+void MainWindow::ImportSimilarityFile() {
+  if (!scheme_generator_) {
+    QMessageBox::critical(this, "Error", "请先导入库文件");
+    return;
+  }
+  QString cur_path = QCoreApplication::applicationDirPath();
+  QString filename = QFileDialog::getOpenFileName(this, "打开相似度文件",
+                                                  cur_path, "文本(*.txt)");
+
+  if (filename.isEmpty()) {
+    return;
+  }
+
+  Q_ASSERT(scheme_generator_);
+  scheme_generator_->LoadSimilarityFile(filename);
 }
 
 void MainWindow::SetupStainingSchemeGenerator(const QString &filename) {
@@ -38,6 +58,8 @@ void MainWindow::SetupStainingSchemeGenerator(const QString &filename) {
 
   connect(scheme_generator_, &StainingSchemeGenerator::LibraryFileLoaded, this,
           &MainWindow::LibraryFileLoadedHandler);
+  connect(scheme_generator_, &StainingSchemeGenerator::SimilarityFileLoaded,
+          this, &MainWindow::SimilarityFileLoadedHandler);
   connect(scheme_generator_,
           &StainingSchemeGenerator::AvailableAntibodiesRefreshed, this,
           &MainWindow::RefreshAvailableAntibodies);
@@ -58,10 +80,23 @@ void MainWindow::SetupStainingSchemeGenerator(const QString &filename) {
 void MainWindow::LibraryFileLoadedHandler(bool success, const QString &filename,
                                           int lines_count) {
   if (!success) {
-    ui->statusbar->showMessage("导入失败！");
+    QMessageBox::critical(this, "Error", "库文件导入失败！");
   }
-  ui->library_file_name_label->setText(QString("库文件 %1").arg(filename));
+  ui->library_file_name_label->setText(
+      QString("库文件(%1) %2").arg(QString::number(lines_count), filename));
   ui->statusbar->showMessage(QString("已成功导入%1条库数据").arg(lines_count));
+}
+
+void MainWindow::SimilarityFileLoadedHandler(bool success,
+                                             const QString &filename,
+                                             int lines_count) {
+  if (!success) {
+    QMessageBox::critical(this, "Error", "相似度文件导入失败！");
+  }
+  ui->similarity_file_name_label->setText(
+      QString("相似度文件(%1) %2").arg(QString::number(lines_count), filename));
+  ui->statusbar->showMessage(
+      QString("已成功导入%1条相似度数据").arg(lines_count));
 }
 
 void MainWindow::RefreshAvailableAntibodies(const QStringList &antibodies) {
@@ -107,8 +142,13 @@ void MainWindow::ShowSchemes(
   ui->generate_result_text_edit->clear();
   for (int i = 0; const auto &result : scheme_result_list) {
     ++i;
-    ui->generate_result_text_edit->append(QString("Scheme #%1").arg(i));
-    for (auto &item : result) {
+    auto similarity = result.similarity == SIMILARITY_INF
+                          ? "INF"
+                          : QString::number(result.similarity);
+    ui->generate_result_text_edit->append(
+        QString("Scheme #%1, MaxSimilarity: %2")
+            .arg(QString::number(i), similarity));
+    for (auto &item : result.staining_groups) {
       ui->generate_result_text_edit->append(
           QString("%1, %2, %3")
               .arg(item.spectrum, item.channel, item.antibody));
