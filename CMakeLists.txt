@@ -15,11 +15,11 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 set(PROJECT_SOURCES
         app_win32.rc
         main.cpp
-        main_window.cpp
-        main_window.h
-        main_window.ui
-        staining_scheme_generator.cc
-        staining_scheme_generator.h
+        src/main_window.cpp
+        src/main_window.h
+        src/ui/main_window.ui
+        src/staining_scheme_generator.cc
+        src/staining_scheme_generator.h
         version.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

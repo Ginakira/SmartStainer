@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QVersionNumber>
 
-#include "main_window.h"
+#include "src/main_window.h"
 #include "version.h"
 
 int main(int argc, char *argv[]) {
