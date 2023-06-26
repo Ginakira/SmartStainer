@@ -26,9 +26,9 @@ using StainingSchemeResultList = QList<StainingSchemeResult>;
 using StainingMap =
     QMap<QString /* antibody */,
          QMap<QString /* spectrum */, QSet<QString> /* channels */>>;
-using SpectrumSimilarityMap =
-    QMap<QString /* spectrum */,
-         QMap<QString /* spectrum */, double /* similarity */>>;
+using ChannelSimilarityMap =
+    QMap<QString /* channel */,
+         QMap<QString /* channel */, double /* similarity */>>;
 
 class StainingSchemeGenerator : public QObject {
   Q_OBJECT
@@ -64,7 +64,7 @@ class StainingSchemeGenerator : public QObject {
   QSet<QString> available_antibodies_;
   StainingMap antibody_spectrum_to_channels_;
   bool similarity_file_loaded_{false};
-  SpectrumSimilarityMap spectrum_to_similarity_;
+  ChannelSimilarityMap channel_to_similarity_;
 };
 
 #endif  // SMARTSTAINER__STAINING_SCHEME_GENERATOR_H_

@@ -67,7 +67,7 @@ bool StainingSchemeGenerator::LoadSimilarityFile(const QString &filename) {
     emit SimilarityFileLoaded(false, "", -1);
     return false;
   }
-  spectrum_to_similarity_.clear();
+  channel_to_similarity_.clear();
 
   int loaded_lines = 0, available_lines = 0;
   while (!file.atEnd()) {
@@ -78,20 +78,21 @@ bool StainingSchemeGenerator::LoadSimilarityFile(const QString &filename) {
       qWarning() << "[Similarity File] Line" << loaded_lines << "is too short!";
       continue;
     }
-    QString spectrum_a = items[0].trimmed();
-    QString spectrum_b = items[1].trimmed();
+    QString channel_a = items[0].trimmed();
+    QString channel_b = items[1].trimmed();
     double similarity = items[2].toDouble();
-    if (spectrum_a.isEmpty() || spectrum_b.isEmpty()) {
+    if (channel_a.isEmpty() || channel_b.isEmpty()) {
       qWarning() << "[Similarity File] Line" << loaded_lines
                  << "content is incorrect!";
       continue;
     }
 
-    spectrum_to_similarity_[spectrum_a][spectrum_b] = similarity;
-    spectrum_to_similarity_[spectrum_b][spectrum_a] = similarity;
+    channel_to_similarity_[channel_a][channel_b] = similarity;
+    channel_to_similarity_[channel_b][channel_a] = similarity;
 
     qInfo() << "[SimilarityFile] Line" << loaded_lines << "loaded."
-            << spectrum_a << "<->" << spectrum_b << "similarity:" << similarity;
+            << channel_a
+            << "<->" << channel_b << "similarity:" << similarity;
     ++available_lines;
   }
 
@@ -173,6 +174,7 @@ void StainingSchemeGenerator::SchemeBacktrace(
     }
   }
 }
+
 void StainingSchemeGenerator::CalculateSimilarity(
     StainingSchemeResult &scheme) {
   const auto &staining_groups = scheme.staining_groups;
@@ -180,16 +182,16 @@ void StainingSchemeGenerator::CalculateSimilarity(
   double max_similarity = -1;
   for (qsizetype i = 0; i < n; ++i) {
     for (qsizetype j = i + 1; j < n; ++j) {
-      auto spectrum_a = staining_groups[i].spectrum;
-      auto spectrum_b = staining_groups[j].spectrum;
-      if (!spectrum_to_similarity_.contains(spectrum_a) &&
-          spectrum_to_similarity_[spectrum_a].contains(spectrum_b)) {
-        qWarning() << "[CalculateSimilarity] similarity of" << spectrum_a
-                   << "<->" << spectrum_b << "is lost.";
+      auto channel_a = staining_groups[i].channel;
+      auto channel_b = staining_groups[j].channel;
+      if (!channel_to_similarity_.contains(channel_a) &&
+          channel_to_similarity_[channel_a].contains(channel_b)) {
+        qWarning() << "[CalculateSimilarity] similarity of" << channel_a
+                   << "<->" << channel_b << "is lost.";
         continue;
       }
       max_similarity =
-          qMax(max_similarity, spectrum_to_similarity_[spectrum_a][spectrum_b]);
+          qMax(max_similarity, channel_to_similarity_[channel_a][channel_b]);
     }
   }
   if (max_similarity != -1) {
